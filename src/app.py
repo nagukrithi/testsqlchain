@@ -146,59 +146,6 @@ if 'agent_memory_python' not in st.session_state:
 if 'connection_tested' not in st.session_state:
     st.session_state.connection_tested = False
 
-# Add connection management functions
-def create_db_connection(config):
-    """Create and return database connection"""
-    try:
-        connection_string = (
-            f"mysql+pymysql://{config['USER']}:{config['PASSWORD']}@"
-            f"{config['HOST']}:{config['PORT']}/{config['DATABASE']}"
-        )
-        engine = create_engine(connection_string, pool_pre_ping=True)
-        db = SQLDatabase.from_uri(connection_string)
-        return db
-    except Exception as e:
-        st.sidebar.error(f"Failed to create connection: {str(e)}")
-        return None
-
-def verify_connection():
-    """Verify database connection is active"""
-    if not st.session_state.get('db_config'):
-        st.error("Database configuration not found")
-        return False
-    
-    if not st.session_state.get('db_connection'):
-        st.error("No active database connection")
-        return False
-        
-    try:
-        # Test connection with a simple query
-        st.session_state.db_connection.run("SELECT 1")
-        return True
-    except:
-        # Try to reconnect
-        st.session_state.db_connection = create_db_connection(st.session_state.db_config)
-        return st.session_state.db_connection is not None
-
-def execute_query(query):
-    """Execute query with connection verification"""
-    max_retries = 3
-    retry_count = 0
-    
-    while retry_count < max_retries:
-        if verify_connection():
-            try:
-                result = st.session_state.db_connection.run(query)
-                return result
-            except exc.SQLAlchemyError as e:
-                retry_count += 1
-                if retry_count == max_retries:
-                    st.error(f"Query failed after {max_retries} attempts: {str(e)}")
-                    return None
-                time.sleep(1)  # Wait before retry
-        else:
-            st.error("Connection verification failed")
-            return None
 
 # Suppress warnings
 warnings.filterwarnings("ignore")
