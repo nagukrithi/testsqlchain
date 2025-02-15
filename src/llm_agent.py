@@ -43,52 +43,6 @@ chat_openai_model_kwargs = {
     "presence_penalty": -1,
 }
 
-def get_chat_openai(model_name):
-    """
-    Returns an instance of the ChatOpenAI class initialized with the specified model name.
-    Args:
-        model_name (str): The name of the model to use.
-    Returns:
-        ChatOpenAI: An instance of the ChatOpenAI class.
-    """
-    llm = ChatOpenAI(
-        model_name=model_name,
-        model_kwargs=chat_openai_model_kwargs,
-        **langchain_chat_kwargs
-    )
-    return llm
-
-
-def get_sql_toolkit(tool_llm_name: str):
-    """
-    Instantiates a SQLDatabaseToolkit object with the specified language model.
-    This function creates a SQLDatabaseToolkit object configured with a language model
-    obtained by the provided model name. The SQLDatabaseToolkit facilitates SQL query
-    generation and interaction with a database.
-
-    Args:
-        tool_llm_name (str): The name or identifier of the language model to be used.
-    Returns:
-        SQLDatabaseToolkit: An instance of SQLDatabaseToolkit initialized with the provided language model.
-    """
-    llm_tool = get_chat_openai(model_name=tool_llm_name)
-    toolkit = SQLDatabaseToolkit(db=db, llm=llm_tool)
-    return toolkit
-
-
-def get_agent_llm(agent_llm_name: str):
-    """
-    Retrieve a language model agent for conversational tasks.
-
-    Args:
-        agent_llm_name (str): The name or identifier of the language model for the agent.
-    Returns:
-        ChatOpenAI: A language model agent configured for conversational tasks.
-    """
-    llm_agent = get_chat_openai(model_name=agent_llm_name)
-    return llm_agent
-
-
 def initialize_python_agent(agent_llm_name: str = LLM_MODEL_NAME):
     """
     Create an agent for Python-related tasks.
@@ -177,3 +131,4 @@ def initialize_sql_agent(db_config):
         )
     except Exception as e:
         raise ValueError(f"Failed to initialize SQL agent: {str(e)}")
+
