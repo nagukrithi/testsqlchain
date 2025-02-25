@@ -14,6 +14,10 @@ from sqlalchemy import create_engine, exc, text
 import pymysql
 import time
 
+# Nagu Changes below
+import pandas as pd
+
+
 OPENAI_API_KEY = st.secrets["openai"]["OPENAI_API_KEY"]
 st.set_page_config(page_title="SQL and Python Agent")
 
@@ -41,6 +45,13 @@ user = st.sidebar.text_input("User", value=st.session_state.db_config['USER'])
 password = st.sidebar.text_input("Password", type="password", value=st.session_state.db_config['PASSWORD'])
 host = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
 port = st.sidebar.text_input("Port", value=st.session_state.db_config['PORT'])
+
+# Nagu-Changes 
+user_secondary = st.sidebar.text_input("User", value=st.session_state.db_config['USER'])
+password_secondary = st.sidebar.text_input("Password", type="password", value=st.session_state.db_config['PASSWORD'])
+host_secondary = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
+port_secondary = st.sidebar.text_input("Port", value=st.session_state.db_config['PORT'])
+
 
 # 3. Single dynamic button label.
 button_label = "Save and Connect" if not st.session_state.db_connected else "Update Connection"
@@ -80,6 +91,42 @@ def test_connection(config):
         return False, []
     return False, []
 
+def test_connection_secondary(config):
+    """Check DB connectivity and, if successful, fetch all databases."""
+    try:
+        connection_string = (
+            f"mysql+pymysql://{config['USER']}:{urllib.parse.quote_plus(config['PASSWORD'])}"
+            f"@{config['HOST']}:{config['PORT']}/"
+        )
+        engine = create_engine(connection_string)
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+
+        # If we succeed, fetch list of databases for the dropdown
+        try:
+            connection = mysql.connector.connect(
+                host=config['HOST'],
+                user=config['USER'],
+                password=config['PASSWORD'],
+                port=config['PORT']
+            )
+            if connection.is_connected():
+                cursor = connection.cursor()
+                cursor.execute("SHOW DATABASES")
+                dbs = [db[0] for db in cursor.fetchall() 
+                       if db[0] not in ('sys', 'mysql','performance_schema','information_schema')]
+                cursor.close()
+                connection.close()
+                return True, dbs
+        except Error as e:
+            st.sidebar.error(f"Error fetching databases: {e}")
+            return False, []
+    except Exception as e:
+        st.sidebar.error(f"Connection test failed: {str(e)}")
+        return False, []
+    return False, []
+
+
 # 4. Single button to connect/update.
 if st.sidebar.button(button_label):
     if all([user, password, host, port]):
@@ -91,6 +138,7 @@ if st.sidebar.button(button_label):
             # DATABASE will be selected from dropdown below, so leave it blank initially
             'DATABASE': ''
         }
+
         ok, db_list = test_connection(new_config)
         if ok:
             st.session_state.db_config = new_config
@@ -103,6 +151,35 @@ if st.sidebar.button(button_label):
             st.session_state.databases = []
     else:
         st.sidebar.error("All fields are required")
+
+    # Nagu - Begin Changes 
+    
+    if all([user, password, host, port]):
+        
+        new_config_secondary = {
+            'USER': user,
+            'PASSWORD': password,
+            'HOST': host,
+            'PORT': port,
+            # DATABASE will be selected from dropdown below, so leave it blank initially
+            'DATABASE': ''
+        }
+        
+        ok, db_list = test_connection(new_config_secondary)
+        if ok:
+            st.session_state.db_config = new_config_secondary
+            st.session_state.db_connected = True
+            # Store database list in session for the dropdown
+            st.session_state.databases = db_list
+            st.sidebar.success("Connection test successful! Please select a database.")
+        else:
+            st.session_state.db_connected = False
+            st.session_state.databases = []
+    else:
+        st.sidebar.error("All fields are required")
+
+# Nagu - End Changes 
+
 
 # 5. If connected, show the databases in a dropdown for selection.
 if st.session_state.db_connected and st.session_state.databases:
@@ -118,8 +195,15 @@ if st.session_state.db_connected and st.session_state.databases:
         st.session_state.db_config['DATABASE'] = db_choice
         try:
             st.session_state.sql_agent = initialize_sql_agent(st.session_state.db_config)
+
+            # Nagu Changes Begin 
+            st.session_state.db_config['DATABASE'] = 'Anirudh' 
+            st.session_state.sql_agent_secondary = initialize_sql_agent(st.session_state.db_config)
+            # Nagu Changes End 
+            
             st.session_state.python_agent = initialize_python_agent()
             st.sidebar.success(f"Connected to {db_choice}!")
+
         except Exception as e:
             st.session_state.db_config['DATABASE'] = ''
             st.sidebar.error(f"Connection to {db_choice} failed: {str(e)}")
@@ -226,7 +310,30 @@ def generate_response(code_type, input_text):
             
     else:  # SQL query
         try:
-            return st.session_state.sql_agent.run(local_prompt)
+            # Nagu Change Begin
+            # Step 1: Get SQL query from the natural language input (invoke the LLM agent)
+            sql_query_response = st.session_state.sql_agent.invoke({"input": local_prompt})
+            
+            if not sql_query_response or 'output' not in sql_query_response:
+                return "Failed to generate SQL query from the input."
+       
+            sql_query = sql_query_response['output']
+            print(f"Generated SQL query: {sql_query}")
+            
+            # Step 2: Run the generated SQL query on both databases (use run to execute SQL)
+            primary_db_result = st.session_state.sql_agent.run(sql_query)
+            anirudh_db_result = st.session_state.sql_agent_secondary.run(sql_query)
+
+            # Step 3: Consolidate results from both databases
+            primary_df = pd.DataFrame(primary_db_result)
+            anirudh_df = pd.DataFrame(anirudh_db_result)
+            combined_df = pd.concat([primary_df, anirudh_df], ignore_index=True)
+            
+            # Return the consolidated results or further processing
+            return combined_df.to_dict(orient='records')  
+            
+            #return st.session_state.sql_agent.run(local_prompt)
+            # Nagu Changes End        
         except Exception as e:
             print(f"SQL query error: {str(e)}")
             return """Failed to execute SQL query. Ensure you have enough OpenAI API credits. This is most likely to be the issue."""
