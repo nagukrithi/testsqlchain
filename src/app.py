@@ -322,11 +322,11 @@ def generate_response(code_type, input_text):
             
             # Step 2: Run the generated SQL query on both databases (use run to execute SQL)
             primary_db_result = st.session_state.sql_agent.run(sql_query)
-            anirudh_db_result = st.session_state.sql_agent_secondary.run(sql_query)
+            #anirudh_db_result = st.session_state.sql_agent_secondary.run(sql_query)
 
             # Step 3: Consolidate results from both databases
             primary_df = pd.DataFrame(primary_db_result)
-            anirudh_df = pd.DataFrame(anirudh_db_result)
+            anirudh_df = pd.DataFrame(primary_db_result) #pd.DataFrame(anirudh_db_result)
             combined_df = pd.concat([primary_df, anirudh_df], ignore_index=True)
             
             # Return the consolidated results or further processing
