@@ -47,10 +47,10 @@ host = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
 port = st.sidebar.text_input("Port", value=st.session_state.db_config['PORT'])
 
 # Nagu-Changes 
-user_secondary = st.sidebar.text_input("User", value=st.session_state.db_config['USER'])
-password_secondary = st.sidebar.text_input("Password", type="password", value=st.session_state.db_config['PASSWORD'])
-host_secondary = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
-port_secondary = st.sidebar.text_input("Port", value=st.session_state.db_config['PORT'])
+#user_secondary = st.sidebar.text_input("User", value=st.session_state.db_config['USER'])
+#password_secondary = st.sidebar.text_input("Password", type="password", value=st.session_state.db_config['PASSWORD'])
+#host_secondary = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
+#port_secondary = st.sidebar.text_input("Port", value=st.session_state.db_config['PORT'])
 
 
 # 3. Single dynamic button label.
