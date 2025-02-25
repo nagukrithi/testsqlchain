@@ -312,27 +312,27 @@ def generate_response(code_type, input_text):
         try:
             # Nagu Change Begin
             # Step 1: Get SQL query from the natural language input (invoke the LLM agent)
-            sql_query_response = st.session_state.sql_agent.invoke({"input": local_prompt})
+            #sql_query_response = st.session_state.sql_agent.invoke({"input": local_prompt})
             
-            if not sql_query_response or 'output' not in sql_query_response:
-                return "Failed to generate SQL query from the input."
+            #if not sql_query_response or 'output' not in sql_query_response:
+            #    return "Failed to generate SQL query from the input."
        
-            sql_query = sql_query_response['output']
-            print(f"Generated SQL query: {sql_query}")
+            #sql_query = sql_query_response['output']
+            #print(f"Generated SQL query: {sql_query}")
             
             # Step 2: Run the generated SQL query on both databases (use run to execute SQL)
-            primary_db_result = st.session_state.sql_agent.run(sql_query)
+            #primary_db_result = st.session_state.sql_agent.run(sql_query)
             #anirudh_db_result = st.session_state.sql_agent_secondary.run(sql_query)
 
             # Step 3: Consolidate results from both databases
-            primary_df = pd.DataFrame(primary_db_result)
-            anirudh_df = pd.DataFrame(primary_db_result) #pd.DataFrame(anirudh_db_result)
-            combined_df = pd.concat([primary_df, anirudh_df], ignore_index=True)
+            #primary_df = pd.DataFrame(primary_db_result)
+            #anirudh_df = pd.DataFrame(primary_db_result) #pd.DataFrame(anirudh_db_result)
+            #combined_df = pd.concat([primary_df, anirudh_df], ignore_index=True)
             
             # Return the consolidated results or further processing
-            return combined_df.to_dict(orient='records')  
-            
-            #return st.session_state.sql_agent.run(local_prompt)
+            #return combined_df.to_dict(orient='records')  
+            primary_db_result = st.session_state.sql_agent.run(sql_query)
+            return primary_db_result #st.session_state.sql_agent.run(local_prompt)
             # Nagu Changes End        
         except Exception as e:
             print(f"SQL query error: {str(e)}")
