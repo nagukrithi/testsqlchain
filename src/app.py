@@ -331,7 +331,7 @@ def generate_response(code_type, input_text):
             
             # Return the consolidated results or further processing
             #return combined_df.to_dict(orient='records')  
-            primary_db_result = st.session_state.sql_agent.run(sql_query)
+            primary_db_result = st.session_state.sql_agent.run(local_prompt)
             return primary_db_result #st.session_state.sql_agent.run(local_prompt)
             # Nagu Changes End        
         except Exception as e:
