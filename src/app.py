@@ -46,7 +46,7 @@ password = st.sidebar.text_input("Password", type="password", value=st.session_s
 host = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
 port = st.sidebar.text_input("Port", value=st.session_state.db_config['PORT'])
 
-st.session_state.debug_msg = ""
+st.session_state.debug_msg = "Default Message->"
 debug_msg = st.sidebar.text_area("Debug Message", value=st.session_state.debug_msg, height=200)
 
 # Nagu-Changes 
