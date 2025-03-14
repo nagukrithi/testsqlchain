@@ -153,6 +153,7 @@ if st.sidebar.button(button_label):
     else:
         st.sidebar.error("All fields are required")
 
+    """
     # Nagu - Begin Changes 
     
     if all([user, password, host, port]):
@@ -179,8 +180,8 @@ if st.sidebar.button(button_label):
     else:
         st.sidebar.error("All fields are required")
 
-# Nagu - End Changes 
-
+    # Nagu - End Changes 
+    """
 
 # 5. If connected, show the databases in a dropdown for selection.
 if st.session_state.db_connected and st.session_state.databases:
@@ -196,15 +197,16 @@ if st.session_state.db_connected and st.session_state.databases:
         st.session_state.db_config['DATABASE'] = db_choice
         try:
             st.session_state.sql_agent = initialize_sql_agent(st.session_state.db_config)
-
-            # Nagu Changes Begin 
-            st.session_state.db_config['DATABASE'] = 'Anirudh' 
-            st.session_state.sql_agent_secondary = initialize_sql_agent(st.session_state.db_config)
-            # Nagu Changes End 
             
             st.session_state.python_agent = initialize_python_agent()
             st.sidebar.success(f"Connected to {db_choice}!")
 
+            # Nagu Changes Begin 
+            st.session_state.db_config['DATABASE'] = 'Anirudh' 
+            st.session_state.sql_agent_secondary = initialize_sql_agent(st.session_state.db_config)
+            st.session_state.db_config['DATABASE'] = db_choice  # Reset to original value now 
+            # Nagu Changes End 
+        
         except Exception as e:
             st.session_state.db_config['DATABASE'] = ''
             st.sidebar.error(f"Connection to {db_choice} failed: {str(e)}")
