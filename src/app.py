@@ -46,10 +46,8 @@ password = st.sidebar.text_input("Password", type="password", value=st.session_s
 host = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
 port = st.sidebar.text_input("Port", value=st.session_state.db_config['PORT'])
 
-st.session_state.debug_msg = "Default Message->"
-debug_msg = st.sidebar.text_area("Debug Message", value=st.session_state.debug_msg, height=200)
-
 # Nagu-Changes 
+st.session_state.debug_msg = "Default Message->"
 #user_secondary = st.sidebar.text_input("User", value=st.session_state.db_config['USER'])
 #password_secondary = st.sidebar.text_input("Password", type="password", value=st.session_state.db_config['PASSWORD'])
 #host_secondary = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
@@ -296,7 +294,7 @@ def generate_response(code_type, input_text):
                 
             local_response = sql_response['output']
             #Nagu march 14
-            st.session_state.debug_msg += str(type(local_response)) + "\n"
+            st.session_state.debug_msg += local_response + "\n"
             st.sidebar.text_area("Debug Message", value=st.session_state.debug_msg, height=200)
             #Nagu march 14
             
