@@ -46,6 +46,9 @@ password = st.sidebar.text_input("Password", type="password", value=st.session_s
 host = st.sidebar.text_input("Host", value=st.session_state.db_config['HOST'])
 port = st.sidebar.text_input("Port", value=st.session_state.db_config['PORT'])
 
+st.session_state.debug_msg = ""
+debug_msg = st.sidebar.text_area("Debug Message", value=st.session_state.debug_msg, height=200)
+
 # Nagu-Changes 
 #user_secondary = st.sidebar.text_input("User", value=st.session_state.db_config['USER'])
 #password_secondary = st.sidebar.text_input("Password", type="password", value=st.session_state.db_config['PASSWORD'])
@@ -292,7 +295,9 @@ def generate_response(code_type, input_text):
                 return "Failed to get SQL query results"
                 
             local_response = sql_response['output']
-            print("SQL Response->", local_response)
+            #Nagu march 14
+            st.session_state.debug_msg += local_response + "\n"
+            #Nagu march 14
             
             # Check for invalid/error responses
             exclusion_keywords = ["please provide", "don't know", "more context", 
