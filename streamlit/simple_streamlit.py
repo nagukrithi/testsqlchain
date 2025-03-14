@@ -5,7 +5,7 @@ st.set_page_config(page_title="SQL and Python Agent")
 st.title("SQL and Python Agent")
 
 # SIDE BAR
-st.sidebar.title("DATABASE CONFIGURATION")
+st.sidebar.title("TWO DATABASE CONFIGURATION")
 st.sidebar.subheader("Enter MySQL connection details:", divider=True)
 
 
