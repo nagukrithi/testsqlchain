@@ -38,7 +38,7 @@ if 'databases' not in st.session_state:
     st.session_state.databases = []
 
 # 2. Sidebar user inputs.
-st.sidebar.title("DATABASE CONFIGURATION")
+st.sidebar.title("FROM app.py TWO DATABASE CONFIGURATION")
 st.sidebar.subheader("Enter MySQL connection details:", divider=True)
 
 user = st.sidebar.text_input("User", value=st.session_state.db_config['USER'])
@@ -331,9 +331,16 @@ def generate_response(code_type, input_text):
             
             # Return the consolidated results or further processing
             #return combined_df.to_dict(orient='records')  
+            #Nagu March 14 original code below 
+            #primary_db_result = st.session_state.sql_agent.run(local_prompt)
+            #return primary_db_result #st.session_state.sql_agent.run(local_prompt)
+            # Nagu March 14 End original code Changes End
+
+            #Nagu - new march 14 
             primary_db_result = st.session_state.sql_agent.run(local_prompt)
-            return primary_db_result #st.session_state.sql_agent.run(local_prompt)
-            # Nagu Changes End        
+            primary_df = pd.DataFrame(primary_db_result)
+            return primary_df
+            #Nagu - end new march 14 
         except Exception as e:
             print(f"SQL query error: {str(e)}")
             return """Failed to execute SQL query. Ensure you have enough OpenAI API credits. This is most likely to be the issue."""
