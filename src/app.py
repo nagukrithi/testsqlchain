@@ -338,8 +338,9 @@ def generate_response(code_type, input_text):
 
             #Nagu - new march 14 
             primary_db_result = st.session_state.sql_agent.run(local_prompt)
-            primary_df = pd.DataFrame(primary_db_result)
-            return primary_df
+            anirudh_db_result = st.session_state.sql_agent_secondary.run(local_prompt)
+            consolidated_result = primary_db_result + "\n\n" + anirudh_db_result 
+            return consolidated_result
             #Nagu - end new march 14 
         except Exception as e:
             print(f"SQL query error: {str(e)}")
