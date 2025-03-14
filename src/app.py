@@ -308,7 +308,7 @@ def generate_response(code_type, input_text):
             viz_prompt = {"input": "Write code in python to plot the following data\n\n" + local_response}
 
             #Nagu march 14
-            st.session_state.debug_msg += viz_prompt + "\n"
+            st.session_state.debug_msg += str(type(viz_prompt)) + "\n"
             st.sidebar.text_area("Debug Message", value=st.session_state.debug_msg, height=200)
             #Nagu march 14
             
