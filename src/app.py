@@ -294,7 +294,7 @@ def generate_response(code_type, input_text):
                 
             local_response = sql_response['output']
             #Nagu march 14
-            st.session_state.debug_msg += local_response + "\n"
+            st.session_state.debug_msg += local_response + "\n" + "local prompt = " + local_prompt + "\n"
             st.sidebar.text_area("Debug Message", value=st.session_state.debug_msg, height=200)
             #Nagu march 14
             
